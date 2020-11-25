@@ -42,6 +42,9 @@ namespace CASCLib
             if (File.Exists(Path.Combine(path, "x86_64", "Warcraft III.exe")))
                 return CASCGameType.WC3;
 
+            if (File.Exists(Path.Combine(path, "_ptr_", "x86_64", "Warcraft III.exe")))
+                return CASCGameType.WC3;
+
             if (Directory.Exists(Path.Combine(path, "Data")))
             {
                 if (File.Exists(Path.Combine(path, "Diablo III.exe")))
@@ -63,7 +66,7 @@ namespace CASCLib
                         return CASCGameType.WoW;
                 }
 
-                string[] subFolders = new string[] { "_retail_", "_ptr_", "_beta_", "_alpha_", "_classic_", "_classic_beta_", "_classic_ptr_" };
+                string[] subFolders = new string[] { "_retail_", "_ptr_", "_beta_", "_alpha_", "_event1_", "_classic_", "_classic_beta_", "_classic_ptr_" };
 
                 foreach (var subFolder in subFolders)
                 {
@@ -79,6 +82,12 @@ namespace CASCLib
                             return CASCGameType.WoW;
                     }
                 }
+
+                if (File.Exists(Path.Combine(path, "_retail_", "x86_64", "Warcraft III.exe")))
+                    return CASCGameType.WC3;
+
+                if (File.Exists(Path.Combine(path, "_ptr_", "x86_64", "Warcraft III.exe")))
+                    return CASCGameType.WC3;
 
                 if (File.Exists(Path.Combine(path, "Agent.exe")))
                     return CASCGameType.Agent;

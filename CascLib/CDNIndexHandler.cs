@@ -104,9 +104,9 @@ namespace CASCLib
                         ParseIndex(fs, i);
                 }
             }
-            catch
+            catch (Exception exc)
             {
-                throw new Exception("DownloadFile failed!");
+                throw new Exception($"DownloadFile failed: {archive} - {exc}");
             }
         }
 
@@ -128,9 +128,9 @@ namespace CASCLib
                     DownloadIndexFile(archive, i);
                 }
             }
-            catch
+            catch (Exception exc)
             {
-                throw new Exception("OpenFile failed: " + archive);
+                throw new Exception($"OpenFile failed: {archive} - {exc}");
             }
         }
 
@@ -229,8 +229,8 @@ namespace CASCLib
             //}
 
             HttpWebRequest req = WebRequest.CreateHttp(url);
-            long fileSize = GetFileSize(url);
-            req.AddRange(0, fileSize - 1);
+            //long fileSize = GetFileSize(url);
+            //req.AddRange(0, fileSize - 1);
             using (HttpWebResponse resp = (HttpWebResponse)req.GetResponse())
             using (Stream respStream = resp.GetResponseStream())
             {
@@ -244,8 +244,8 @@ namespace CASCLib
         private Stream OpenFile(string url)
         {
             HttpWebRequest req = WebRequest.CreateHttp(url);
-            long fileSize = GetFileSize(url);
-            req.AddRange(0, fileSize - 1);
+            //long fileSize = GetFileSize(url);
+            //req.AddRange(0, fileSize - 1);
             using (HttpWebResponse resp = (HttpWebResponse)req.GetResponse())
             using (Stream stream = resp.GetResponseStream())
             {

@@ -82,7 +82,7 @@ namespace CASCLib
             if (stream != null)
             {
                 Logger.WriteLine("CDNCache: {0} has been opened", file);
-                numFilesOpened++;
+                CDNCacheStats.numFilesOpened++;
             }
 
             return stream;
@@ -97,11 +97,8 @@ namespace CASCLib
 
             FileInfo fi = new FileInfo(file);
 
-            if (!fi.Exists)
-            {
-                if (!DownloadFile(cdnPath, file))
-                    return null;
-            }
+            if (!fi.Exists && !DownloadFile(cdnPath, file))
+                return null;
 
             stream = fi.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
@@ -111,7 +108,7 @@ namespace CASCLib
                     meta = GetMetaData(cdnPath, fileName);
 
                 if (meta == null)
-                    throw new Exception(string.Format("unable to validate file {0}", file));
+                    throw new InvalidDataException(string.Format("unable to validate file {0}", file));
 
                 bool sizeOk, md5Ok;
 
@@ -140,7 +137,20 @@ namespace CASCLib
 
         private CacheMetaData CacheFile(HttpWebResponse resp, string fileName)
         {
-            string md5 = resp.Headers[HttpResponseHeader.ETag].Split(':')[0].Substring(1);
+            var etag = resp.Headers[HttpResponseHeader.ETag];
+
+            string md5;
+
+            if (etag != null)
+            {
+                md5 = etag.Split(':')[0].Substring(1);
+            }
+            else
+            {
+                md5 = "0";
+
+            }
+
             CacheMetaData meta = new CacheMetaData(resp.ContentLength, md5);
             _metaData[fileName] = meta;
 
@@ -174,10 +184,6 @@ namespace CASCLib
                 }
             }
         }
-
-        public static TimeSpan timeSpentDownloading = TimeSpan.Zero;
-        public static int numFilesOpened = 0;
-        public static int numFilesDownloaded = 0;
 
         private bool DownloadFile(string cdnPath, string path, int numRetries = 0)
         {
@@ -244,8 +250,8 @@ namespace CASCLib
             }
 
             TimeSpan timeSpent = DateTime.Now - startTime;
-            timeSpentDownloading += timeSpent;
-            numFilesDownloaded++;
+            CDNCacheStats.timeSpentDownloading += timeSpent;
+            CDNCacheStats.numFilesDownloaded++;
 
             Logger.WriteLine("CDNCache: {0} has been downloaded, spent {1}", url, timeSpent);
 
